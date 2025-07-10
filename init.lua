@@ -176,6 +176,10 @@ require('lazy').setup({
     'navarasu/onedark.nvim',
     priority = 1000,
     config = function()
+      require('onedark').setup{
+        style = 'dark',
+        transparent = true,
+      }
       vim.cmd.colorscheme 'onedark'
     end,
   },
@@ -473,6 +477,9 @@ require('lazy').setup({
       -- { "<c-s>", mode = { "c" }, function() require("flash").toggle() end, desc = "Toggle Flash Search" },
     },
   },
+  --only turn on when also having plugin in webbrowser
+  --https://chromewebstore.google.com/detail/firenvim/egpjdkipkomnmjhjmdamaniclmdlobbo
+  { 'glacambre/firenvim', build = ":call firenvim#install(0)" },
   -- {
   -- 'stevearc/oil.nvim',
   -- ---@module 'oil'
@@ -505,7 +512,7 @@ vim.keymap.set('t', '<Esc>', [[<C-\><C-n>]])
 -- Make line numbers default
 vim.wo.number = true
 vim.wo.relativenumber = true
-vim.wo.cursorline = true
+-- vim.wo.cursorline = true
 
 local function telescope_live_grep_open_files()
   require('telescope.builtin').live_grep {
@@ -793,6 +800,7 @@ local on_attach = function(_, bufnr)
   end, { desc = 'Format current buffer with LSP' })
 end
 
+
 -- document existing key chains
 -- require('which-key').register {
 --   ['<leader>c'] = { name = '[C]ode', _ = 'which_key_ignore' },
@@ -875,8 +883,8 @@ local servers = {
   -- clangd = {},
   gopls = {},
   csharp_ls = {},
-  -- pyright = {},
-  -- rust_analyzer = {},
+  pyright = {},
+  rust_analyzer = {},
   -- tsserver = {},
   -- html = { filetypes = { 'html', 'twig', 'hbs'} },
 
@@ -972,5 +980,6 @@ vim.api.nvim_create_autocmd("BufWritePre", {
   pattern = "*",
   command = "%s/\\s\\+$//e",
 })
+
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
