@@ -232,20 +232,63 @@ require('lazy').setup({
     end,
   },
 
-  {
-    -- Set lualine as statusline
-    'nvim-lualine/lualine.nvim',
-    -- See `:help lualine.txt`
-    opts = {
-      options = {
-        icons_enabled = false,
-        theme = 'onedark',
-        component_separators = '|',
-        section_separators = '',
-      },
-    },
-  },
+  -- {
+  --   -- Set lualine as statusline
+  --   'nvim-lualine/lualine.nvim',
+  --   -- See `:help lualine.txt`
+  --   opts = {
+  --     options = {
+  --       icons_enabled = false,
+  --       theme = 'onedark',
+  --       component_separators = '|',
+  --       section_separators = '',
+  --     },
+  --   },
+  -- },
 
+-- lua/plugins/lualine.lua
+  {
+    'nvim-lualine/lualine.nvim',
+    dependencies = { 'nvim-tree/nvim-web-devicons' },
+    config = function()
+      -- Macro recording indicator
+      local function recording_macro()
+        local reg = vim.fn.reg_recording()
+        return reg ~= '' and 'Recording @' .. reg or ''
+      end
+
+      -- Refresh statusline on macro events
+      vim.api.nvim_create_autocmd("RecordingEnter", {
+        callback = function()
+          vim.cmd('redrawstatus')
+        end,
+      })
+      vim.api.nvim_create_autocmd("RecordingLeave", {
+        callback = function()
+          vim.defer_fn(function()
+            vim.cmd('redrawstatus')
+          end, 50)
+        end,
+      })
+
+      require('lualine').setup {
+        options = {
+          theme = 'auto',
+          component_separators = { left = '', right = '' },
+          section_separators   = { left = '', right = '' },
+          icons_enabled = true,
+        },
+        sections = {
+          lualine_a = { 'mode' },
+          lualine_b = { 'branch', recording_macro },
+          lualine_c = { 'filename' },
+          lualine_x = { 'diagnostics', 'encoding', 'fileformat', 'filetype' },
+          lualine_y = { 'progress' },
+          lualine_z = { 'location' },
+        },
+      }
+    end,
+  },
   {
     -- Add indentation guides even on blank lines
     'lukas-reineke/indent-blankline.nvim',
