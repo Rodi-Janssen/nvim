@@ -1,15 +1,12 @@
--- Set <space> as the leader key
--- See `:help mapleader`
---  NOTE: Must happen before plugins are required (otherwise wrong leader will be used)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
-vim.o.tabstop = 4 -- set tabs to 4 spaces
-
+vim.o.tabstop        = 2
+vim.o.shiftwidth = 2
+vim.o.softtabstop = 2
+vim.o.expandtab = true
 vim.cmd("languag en_us")
 
--- [[ Install `lazy.nvim` plugin manager ]]
 --    https://github.com/folke/lazy.nvim
---    `:help lazy.nvim.txt` for more info
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
 if not vim.loop.fs_stat(lazypath) then
   vim.fn.system {
@@ -23,24 +20,7 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
--- [[ Configure plugins ]]
--- NOTE: Here is where you install your plugins.
---  You can configure plugins using the `config` key.
---
---  You can also configure plugins after the setup call,
---    as they will be available in your neovim runtime.
 require('lazy').setup({
-  -- NOTE: First, some plugins that don't require any configuration
-
-  -- Git related plugins
-  -- 'tpope/vim-fugitive',
-  -- 'tpope/vim-rhubarb',
-
-  -- Detect tabstop and shiftwidth automatically
-  -- 'tpope/vim-sleuth',
-
-  -- NOTE: This is where your plugins related to LSP can be installed.
-  --  The configuration is done below. Search for lspconfig to find it below.
   {
     -- LSP Configuration & Plugins
     'neovim/nvim-lspconfig',
@@ -76,101 +56,25 @@ require('lazy').setup({
   {
     "folke/which-key.nvim",
     config = function()
-        local wk = require("which-key")
-        wk.setup({})
+      local wk = require("which-key")
+      wk.setup({})
     end,
-},
-{
-  "folke/noice.nvim",
-  event = "VeryLazy",
-  opts = {
-    -- add any options here
   },
-  dependencies = {
-    -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
-    "MunifTanjim/nui.nvim",
-    -- OPTIONAL:
-    --   `nvim-notify` is only needed, if you want to use the notification view.
-    --   If not available, we use `mini` as the fallback
-    "rcarriga/nvim-notify",
+  {
+    "folke/noice.nvim",
+    event = "VeryLazy",
+    opts = {
+      -- add any options here
+    },
+    dependencies = {
+      -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
+      "MunifTanjim/nui.nvim",
+      -- OPTIONAL:
+      --   `nvim-notify` is only needed, if you want to use the notification view.
+      --   If not available, we use `mini` as the fallback
+      "rcarriga/nvim-notify",
     }
-},
-  -- Useful plugin to show you pending keybinds.
-  -- {
-  --   -- Adds git related signs to the gutter, as well as utilities for managing changes
-  --   'lewis6991/gitsigns.nvim',
-  --   opts = {
-  --     -- See `:help gitsigns.txt`
-  --     signs = {
-  --       add = { text = '+' },
-  --       change = { text = '~' },
-  --       delete = { text = '_' },
-  --       topdelete = { text = '‾' },
-  --       changedelete = { text = '~' },
-  --     },
-  --     on_attach = function(bufnr)
-  --       local gs = package.loaded.gitsigns
-  --
-  --       local function map(mode, l, r, opts)
-  --         opts = opts or {}
-  --         opts.buffer = bufnr
-  --         vim.keymap.set(mode, l, r, opts)
-  --       end
-  --
-  --       -- Navigation
-  --       map({ 'n', 'v' }, ']c', function()
-  --         if vim.wo.diff then
-  --           return ']c'
-  --         end
-  --         vim.schedule(function()
-  --           gs.next_hunk()
-  --         end)
-  --         return '<Ignore>'
-  --       end, { expr = true, desc = 'Jump to next hunk' })
-  --
-  --       map({ 'n', 'v' }, '[c', function()
-  --         if vim.wo.diff then
-  --           return '[c'
-  --         end
-  --         vim.schedule(function()
-  --           gs.prev_hunk()
-  --         end)
-  --         return '<Ignore>'
-  --       end, { expr = true, desc = 'Jump to previous hunk' })
-  --
-  --       -- Actions
-  --       -- visual mode
-  --       map('v', '<leader>hs', function()
-  --         gs.stage_hunk { vim.fn.line '.', vim.fn.line 'v' }
-  --       end, { desc = 'stage git hunk' })
-  --       map('v', '<leader>hr', function()
-  --         gs.reset_hunk { vim.fn.line '.', vim.fn.line 'v' }
-  --       end, { desc = 'reset git hunk' })
-  --       -- normal mode
-  --       map('n', '<leader>hs', gs.stage_hunk, { desc = 'git stage hunk' })
-  --       map('n', '<leader>hr', gs.reset_hunk, { desc = 'git reset hunk' })
-  --       map('n', '<leader>hS', gs.stage_buffer, { desc = 'git Stage buffer' })
-  --       map('n', '<leader>hu', gs.undo_stage_hunk, { desc = 'undo stage hunk' })
-  --       map('n', '<leader>hR', gs.reset_buffer, { desc = 'git Reset buffer' })
-  --       map('n', '<leader>hp', gs.preview_hunk, { desc = 'preview git hunk' })
-  --       map('n', '<leader>hb', function()
-  --         gs.blame_line { full = false }
-  --       end, { desc = 'git blame line' })
-  --       map('n', '<leader>hd', gs.diffthis, { desc = 'git diff against index' })
-  --       map('n', '<leader>hD', function()
-  --         gs.diffthis '~'
-  --       end, { desc = 'git diff against last commit' })
-  --
-  --       -- Toggles
-  --       map('n', '<leader>tb', gs.toggle_current_line_blame, { desc = 'toggle git blame line' })
-  --       map('n', '<leader>td', gs.toggle_deleted, { desc = 'toggle git show deleted' })
-  --
-  --       -- Text object
-  --       map({ 'o', 'x' }, 'ih', ':<C-U>Gitsigns select_hunk<CR>', { desc = 'select git hunk' })
-  --     end,
-  --   },
-  -- },
-  -- { "catppuccin/nvim", name = "catppuccin", priority = 1000 },
+  },
   {
     -- Theme inspired by Atom
     'navarasu/onedark.nvim',
@@ -183,7 +87,6 @@ require('lazy').setup({
       vim.cmd.colorscheme 'onedark'
     end,
   },
-
   {
   "startup-nvim/startup.nvim",
   dependencies = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim", "nvim-telescope/telescope-file-browser.nvim" },
@@ -191,7 +94,6 @@ require('lazy').setup({
     require "startup".setup()
   end
   },
-
   {
     "L3MON4D3/LuaSnip",
     version = "v2.*", -- use v2 or later for Neovim 0.10+
@@ -231,22 +133,6 @@ require('lazy').setup({
       end, { silent = true })
     end,
   },
-
-  -- {
-  --   -- Set lualine as statusline
-  --   'nvim-lualine/lualine.nvim',
-  --   -- See `:help lualine.txt`
-  --   opts = {
-  --     options = {
-  --       icons_enabled = false,
-  --       theme = 'onedark',
-  --       component_separators = '|',
-  --       section_separators = '',
-  --     },
-  --   },
-  -- },
-
--- lua/plugins/lualine.lua
   {
     'nvim-lualine/lualine.nvim',
     dependencies = { 'nvim-tree/nvim-web-devicons' },
@@ -297,19 +183,13 @@ require('lazy').setup({
     main = 'ibl',
     opts = {},
   },
-
-  -- "gc" to comment visual regions/lines
-  { 'numToStr/Comment.nvim', opts = {} },
-
-  -- Fuzzy Finder (files, lsp, etc)
+  { 'numToStr/Comment.nvim', opts = {} }, -- "gc" to comment visual regions/lines
   {
     'nvim-telescope/telescope.nvim',
     branch = '0.1.x',
     dependencies = {
       'nvim-lua/plenary.nvim',
       -- Fuzzy Finder Algorithm which requires local dependencies to be built.
-      -- Only load if `make` is available. Make sure you have the system
-      -- requirements installed.
       {
         'nvim-telescope/telescope-fzf-native.nvim',
         -- NOTE: If you are having trouble with this installation,
@@ -321,7 +201,6 @@ require('lazy').setup({
       },
     },
   },
-
   {
     -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
@@ -330,33 +209,6 @@ require('lazy').setup({
     },
     build = ':TSUpdate',
   },
---   {
---   "ThePrimeagen/harpoon",
---   requires = { "nvim-lua/plenary.nvim" },
---   config = function()
---     require("harpoon").setup {
---       menu = {
---         width = vim.api.nvim_win_get_width(0) - 4,
---       }
---     }
---
---     -- Keybindings
---     vim.api.nvim_set_keymap('n', '<F2>', ":lua require('harpoon.mark').add_file()<CR>", { noremap = true, silent = true })
---     vim.api.nvim_set_keymap('n', '<F3>', ":lua require('harpoon.ui').toggle_quick_menu()<CR>", { noremap = true, silent = true })
---     vim.api.nvim_set_keymap('n', '<leader>1', ":lua require('harpoon.ui').nav_file(1)<CR>", { noremap = true, silent = true })
---     vim.api.nvim_set_keymap('n', '<leader>2', ":lua require('harpoon.ui').nav_file(2)<CR>", { noremap = true, silent = true })
--- -- :lua require("harpoon.ui").nav_next()
--- -- :lua require("harpoon.ui").nav_prev()
---   end
---   },
- --  {
- --  "jiaoshijie/undotree",
- --  dependencies = "nvim-lua/plenary.nvim",
- --  config = true,
- --  keys = { -- load the plugin only when using it's keybinding:
- --    { "<leader>u", "<cmd>lua require('undotree').toggle()<cr>" },
- --  },
- -- },
   {
     "nvim-tree/nvim-web-devicons",  -- Icon support
   },
@@ -382,12 +234,6 @@ require('lazy').setup({
       { "<leader>lg", "<cmd>LazyGit<cr>", desc = "LazyGit" }
     }
   },
-  -- {
-  --   "https://github.com/alec-gibson/nvim-tetris",
-  -- },
-  -- {
-  --   "https://github.com/ThePrimeagen/vim-be-good",
-  -- },
   {
     'windwp/nvim-autopairs',
     event = "InsertEnter",
@@ -513,7 +359,7 @@ require('lazy').setup({
     opts = {},
     -- stylua: ignore
     keys = {
-      { "r", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
+      { "f", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
       -- { "S", mode = { "n", "x", "o" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
       -- { "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
       -- { "R", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
@@ -523,15 +369,6 @@ require('lazy').setup({
   --only turn on when also having plugin in webbrowser
   --https://chromewebstore.google.com/detail/firenvim/egpjdkipkomnmjhjmdamaniclmdlobbo
   { 'glacambre/firenvim', build = ":call firenvim#install(0)" },
-  -- {
-  -- 'stevearc/oil.nvim',
-  -- ---@module 'oil'
-  -- ---@type oil.SetupOpts
-  -- opts = {},
-  -- -- Optional dependencies
-  -- dependencies = { { "echasnovski/mini.icons", opts = {} } },
-  -- -- dependencies = { "nvim-tree/nvim-web-devicons" }, -- use if prefer nvim-web-devicons
-  -- },
   {
     "leath-dub/snipe.nvim",
     keys = {
@@ -539,18 +376,8 @@ require('lazy').setup({
     },
     opts = {}
   }
-  -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
-  --    You can use this folder to prevent any conflicts with this init.lua if you're interested in keeping
-  --    up-to-date with whatever is in the kickstart repo.
-  --    Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
-  --
-  --    For additional information see: https://github.com/folke/lazy.nvim#-structuring-your-plugins
-  -- { import = 'custom.plugins' },
 }, {})
 
--- [[ Setting options ]]
--- See `:help vim.o`
--- NOTE: You can change these options as you wish!
 vim.keymap.set('t', '<Esc>', [[<C-\><C-n>]])
 -- Make line numbers default
 vim.wo.number = true
@@ -602,51 +429,28 @@ vim.keymap.set('n', '<C-s>', ':w<cr>', {})
 
 vim.o.hlsearch = false
 
-
 -- Enable mouse mode
 vim.o.mouse = 'a'
-
--- Sync clipboard between OS and Neovim.
---  Remove this option if you want your OS clipboard to remain independent.
---  See `:help 'clipboard'`
-vim.o.clipboard = 'unnamedplus'
-
--- Enable break indent
+vim.o.clipboard = 'unnamedplus' -- Sync clipboard between OS and Neovim.
 vim.o.breakindent = true
-
--- Save undo history
-vim.o.undofile = true
-
+vim.o.undofile = true -- Save undo history
 -- Case-insensitive searching UNLESS \C or capital in search
 vim.o.ignorecase = true
 vim.o.smartcase = true
 
 -- Keep signcolumn on by default
 vim.wo.signcolumn = 'yes'
-
--- Decrease update time
-vim.o.updatetime = 250
+vim.o.updatetime = 250 -- Decrease update time
 vim.o.timeoutlen = 300
-
--- Set completeopt to have a better completion experience
 vim.o.completeopt = 'menuone,noselect'
-
--- NOTE: You should make sure your terminal supports this
 vim.o.termguicolors = true
 
 -- [[ Basic Keymaps ]]
 
--- Keymaps for better default experience
--- See `:help vim.keymap.set()`
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
-
--- Remap for dealing with word wrap
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
-
--- set caps to escape
 vim.keymap.set('i', '<CapsLock>', '<Esc>', { expr = true, silent = true, desc = 'esc'})
-
 
 -- Diagnostic keymaps
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic message' })
@@ -719,7 +523,6 @@ vim.api.nvim_create_user_command('LiveGrepGitRoot', live_grep_git_root, {})
 
 -- See `:help telescope.builtin`
 vim.keymap.set('n', '<leader>?', require('telescope.builtin').oldfiles, { desc = '[?] Find recently opened files' })
--- vim.keymap.set('n', '<leader><space>', require('telescope.builtin').buffers, { desc = '[ ] Find existing buffers' })
 vim.keymap.set('n', '<leader>/', function()
   -- You can pass additional configuration to telescope to change theme, layout, etc.
   require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
@@ -731,7 +534,6 @@ end, { desc = '[/] Fuzzily search in current buffer' })
 
 -- [[ Configure Treesitter ]]
 -- See `:help nvim-treesitter`
--- Defer Treesitter setup after first render to improve startup time of 'nvim {filename}'
 vim.defer_fn(function()
   require('nvim-treesitter.configs').setup {
     -- Add languages to be installed here that you want installed for treesitter
@@ -801,12 +603,6 @@ end, 0)
 -- [[ Configure LSP ]]
 --  This function gets run when an LSP connects to a particular buffer.
 local on_attach = function(_, bufnr)
-  -- NOTE: Remember that lua is a real programming language, and as such it is possible
-  -- to define small helper and utility functions so you don't have to repeat yourself
-  -- many times.
-  --
-  -- In this case, we create a function that lets us more easily define mappings specific
-  -- for LSP related items. It sets the mode, buffer and description for us each time.
   local nmap = function(keys, func, desc)
     if desc then
       desc = 'LSP: ' .. desc
@@ -843,85 +639,10 @@ local on_attach = function(_, bufnr)
   end, { desc = 'Format current buffer with LSP' })
 end
 
-
--- document existing key chains
--- require('which-key').register {
---   ['<leader>c'] = { name = '[C]ode', _ = 'which_key_ignore' },
---   ['<leader>d'] = { name = '[D]ocument', _ = 'which_key_ignore' },
---   ['<leader>g'] = { name = '[G]it', _ = 'which_key_ignore' },
---   ['<leader>h'] = { name = 'Git [H]unk', _ = 'which_key_ignore' },
---   ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
---   ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
---   ['<leader>t'] = { name = '[T]oggle', _ = 'which_key_ignore' },
---   ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
---   -- add new keybinds for which-key plugin
---   ['<leader>f'] = { name = 'Telescope plugin', _ = 'which_key_ignore' },
---   ['<leader>ff'] = { name = '[F]ind [F]iles', _ = 'which_key_ignore' },
---   ['<leader>fg'] = { name = 'live grep', _ = 'which_key_ignore' },
---   ['<leader>fb'] = { name = 'buffers', _ = 'which_key_ignore' },
---   ['<leader>fh'] = { name = 'help tags', _ = 'which_key_ignore' },
---   ['<leader>il'] = { name = 'init.lua', _ = 'witch_key_ignore'},
---   ['<leader>S'] = { name = 'switch case', _ = 'witch_key_ignore'},
---   ['<leader>u'] = { name = 'undo tree', _ = 'witch_key_ignore'},
--- }
-
--- require('which-key').register {
---   { '<leader>c', group = '[C]ode' },
---   { '<leader>d', group = '[D]ocument' },
---   { '<leader>g', group = '[G]it' },
---   { '<leader>h', group = 'Git [H]unk' },
---   { '<leader>r', group = '[R]ename' },
---   { '<leader>s', group = '[S]earch' },
---   { '<leader>t', group = '[T]oggle' },
---   { '<leader>w', group = '[W]orkspace' },
---   { '<leader>f', group = 'Telescope plugin' },
---   { '<leader>ff', group = '[F]ind [F]iles' },
---   { '<leader>fg', group = 'live grep' },
---   { '<leader>fb', group = 'buffers' },
---   { '<leader>fh', group = 'help tags' },
---   { '<leader>il', group = 'init.lua' },
---   { '<leader>S', group = 'switch case' },
---   { '<leader>u', group = 'undo tree' },
---
---   -- Hidden mappings
---   { '<leader>c_', hidden = true },
---   { '<leader>d_', hidden = true },
---   { '<leader>g_', hidden = true },
---   { '<leader>h_', hidden = true },
---   { '<leader>r_', hidden = true },
---   { '<leader>s_', hidden = true },
---   { '<leader>t_', hidden = true },
---   { '<leader>w_', hidden = true },
---   { '<leader>f_', hidden = true },
---   { '<leader>ff_', hidden = true },
---   { '<leader>fg_', hidden = true },
---   { '<leader>fb_', hidden = true },
---   { '<leader>fh_', hidden = true },
---   { '<leader>il_', hidden = true },
---   { '<leader>S_', hidden = true },
---   { '<leader>u_', hidden = true },
--- }
--- -- register which-key VISUAL mode
--- -- required for visual <leader>hs (hunk stage) to work
--- require('which-key').register({
---   ['<leader>'] = { name = 'VISUAL <leader>' },
---   ['<leader>h'] = { 'Git [H]unk' },
--- }, { mode = 'v' })
-
--- mason-lspconfig requires that these setup functions are called in this order
--- before setting up the servers.
 require('mason').setup()
 require('mason-lspconfig').setup()
+require('neodev').setup()
 
--- Enable the following language servers
---  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
---
---  Add any additional override configuration in the following tables. They will be passed to
---  the `settings` field of the server config. You must look up that documentation yourself.
---
---  If you want to override the default filetypes that your language server will attach to you can
---  define the property 'filetypes' to the map in question.
---  see all https://github.com/williamboman/mason-lspconfig.nvim
 local servers = {
   -- clangd = {},
   gopls = {},
@@ -941,20 +662,18 @@ local servers = {
   },
 }
 
-vim.lsp.set_log_level("warn")
--- Setup neovim lua configuration
-require('neodev').setup()
-
--- nvim-cmp supports additional completion capabilities, so broadcast that to servers
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
-
 -- Ensure the servers above are installed
 local mason_lspconfig = require 'mason-lspconfig'
 
 mason_lspconfig.setup {
   ensure_installed = vim.tbl_keys(servers),
 }
+
+vim.lsp.set_log_level("warn")
+
+-- nvim-cmp supports additional completion capabilities, so broadcast that to servers
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
 
 mason_lspconfig.setup_handlers {
   function(server_name)
