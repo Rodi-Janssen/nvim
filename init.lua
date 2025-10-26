@@ -42,8 +42,8 @@ require('lazy').setup({
     'hrsh7th/nvim-cmp',
     dependencies = {
       -- Snippet Engine & its associated nvim-cmp source
-      'L3MON4D3/LuaSnip',
-      'saadparwaiz1/cmp_luasnip',
+      -- 'L3MON4D3/LuaSnip',
+      -- 'saadparwaiz1/cmp_luasnip',
 
       -- Adds LSP completion capabilities
       'hrsh7th/cmp-nvim-lsp',
@@ -94,45 +94,45 @@ require('lazy').setup({
     require "startup".setup()
   end
   },
-  {
-    "L3MON4D3/LuaSnip",
-    version = "v2.*", -- use v2 or later for Neovim 0.10+
-    build = "make install_jsregexp", -- only if you need regex nodes
-    dependencies = {
-      "rafamadriz/friendly-snippets", -- optional but great for prebuilt snippets
-    },
-    config = function()
-      local luasnip = require("luasnip")
-
-      -- Load snippets from friendly-snippets and your custom snippets
-      require("luasnip.loaders.from_vscode").lazy_load()
-      require("luasnip.loaders.from_lua").load({
-        paths = vim.fn.stdpath("config") .. "/lua/snippets",
-      })
-
-      -- Optional settings
-      luasnip.config.set_config({
-        history = true,
-        updateevents = "TextChanged,TextChangedI",
-        enable_autosnippets = true,
-      })
-
-      -- Keymaps (adjust these as you like)
-      vim.keymap.set({ "i", "s" }, "<Tab>", function()
-        if luasnip.expand_or_jumpable() then
-          luasnip.expand_or_jump()
-        else
-          vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Tab>", true, false, true), "n", true)
-        end
-      end, { silent = true })
-
-      vim.keymap.set({ "i", "s" }, "<S-Tab>", function()
-        if luasnip.jumpable(-1) then
-          luasnip.jump(-1)
-        end
-      end, { silent = true })
-    end,
-  },
+  -- {
+  --   "L3MON4D3/LuaSnip",
+  --   version = "v2.*", -- use v2 or later for Neovim 0.10+
+  --   build = "make install_jsregexp", -- only if you need regex nodes
+  --   dependencies = {
+  --     "rafamadriz/friendly-snippets", -- optional but great for prebuilt snippets
+  --   },
+  --   config = function()
+  --     local luasnip = require("luasnip")
+  --
+  --     -- Load snippets from friendly-snippets and your custom snippets
+  --     require("luasnip.loaders.from_vscode").lazy_load()
+  --     require("luasnip.loaders.from_lua").load({
+  --       paths = vim.fn.stdpath("config") .. "/lua/snippets",
+  --     })
+  --
+  --     -- Optional settings
+  --     luasnip.config.set_config({
+  --       history = true,
+  --       updateevents = "TextChanged,TextChangedI",
+  --       enable_autosnippets = true,
+  --     })
+  --
+  --     -- Keymaps (adjust these as you like)
+  --     vim.keymap.set({ "i", "s" }, "<Tab>", function()
+  --       if luasnip.expand_or_jumpable() then
+  --         luasnip.expand_or_jump()
+  --       else
+  --         vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Tab>", true, false, true), "n", true)
+  --       end
+  --     end, { silent = true })
+  --
+  --     vim.keymap.set({ "i", "s" }, "<S-Tab>", function()
+  --       if luasnip.jumpable(-1) then
+  --         luasnip.jump(-1)
+  --       end
+  --     end, { silent = true })
+  --   end,
+  -- },
   {
     'nvim-lualine/lualine.nvim',
     dependencies = { 'nvim-tree/nvim-web-devicons' },
@@ -201,13 +201,38 @@ require('lazy').setup({
       },
     },
   },
-  {
-    -- Highlight, edit, and navigate code
-    'nvim-treesitter/nvim-treesitter',
-    dependencies = {
-      'nvim-treesitter/nvim-treesitter-textobjects',
-    },
-    build = ':TSUpdate',
+{
+  "nvim-treesitter/nvim-treesitter",
+  build = ":TSUpdate",
+  config = function()
+    local ok, configs = pcall(require, "nvim-treesitter.configs")
+    if not ok then
+      vim.notify("nvim-treesitter not found!", vim.log.levels.ERROR)
+      return
+    end
+    configs.setup {
+      highlight = { enable = true },
+      indent = { enable = true },
+    }
+  end
+-- }
+-- {
+--   "nvim-treesitter/nvim-treesitter",
+--   build = ":TSUpdate",
+--   config = function()
+--     require("nvim-treesitter.configs").setup {
+--       highlight = { enable = true },
+--       indent = { enable = true },
+--     }
+--   end
+-- }
+--   {
+--     -- Highlight, edit, and navigate code
+--     'nvim-treesitter/nvim-treesitter',
+--     dependencies = {
+--       'nvim-treesitter/nvim-treesitter-textobjects',
+--     },
+--     build = ':TSUpdate',
   },
   {
     "nvim-tree/nvim-web-devicons",  -- Icon support
@@ -458,6 +483,13 @@ vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next diagnos
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Open floating diagnostic message' })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
 
+vim.keymap.set('n', 'gd', require('telescope.builtin').lsp_definitions,{ desc = '[G]oto [D]efinition'})
+vim.keymap.set('n', 'gr', require('telescope.builtin').lsp_references, { desc ='[G]oto [R]eferences'})
+vim.keymap.set('n', 'gI', require('telescope.builtin').lsp_implementations, { desc ='[G]oto [I]mplementation'})
+vim.keymap.set('n', '<leader>D', require('telescope.builtin').lsp_type_definitions, { desc ='Type [D]efinition'})
+vim.keymap.set('n', '<leader>ds', require('telescope.builtin').lsp_document_symbols, { desc ='[D]ocument [S]ymbols'})
+vim.keymap.set('n', '<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, { desc ='[W]orkspace [S]ymbols'})
+
 -- [[ Highlight on yank ]]
 -- See `:help vim.highlight.on_yank()`
 local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = true })
@@ -675,68 +707,68 @@ vim.lsp.set_log_level("warn")
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
 
-mason_lspconfig.setup_handlers {
-  function(server_name)
-    require('lspconfig')[server_name].setup {
-      capabilities = capabilities,
-      on_attach = on_attach,
-      settings = servers[server_name],
-      filetypes = (servers[server_name] or {}).filetypes,
-    }
-  end,
-}
+-- mason_lspconfig.setup_handlers {
+--   function(server_name)
+--     require('lspconfig')[server_name].setup {
+--       capabilities = capabilities,
+--       on_attach = on_attach,
+--       settings = servers[server_name],
+--       filetypes = (servers[server_name] or {}).filetypes,
+--     }
+--   end,
+-- }
 
 -- [[ Configure nvim-cmp ]]
 -- See `:help cmp`
 local cmp = require 'cmp'
-local luasnip = require 'luasnip'
-require('luasnip.loaders.from_vscode').lazy_load()
-luasnip.config.setup {}
-
-cmp.setup {
-  snippet = {
-    expand = function(args)
-      luasnip.lsp_expand(args.body)
-    end,
-  },
-  completion = {
-    completeopt = 'menu,menuone,noinsert',
-  },
-  mapping = cmp.mapping.preset.insert {
-    ['<C-n>'] = cmp.mapping.select_next_item(),
-    ['<C-p>'] = cmp.mapping.select_prev_item(),
-    ['<C-b>'] = cmp.mapping.scroll_docs(-4),
-    ['<C-f>'] = cmp.mapping.scroll_docs(4),
-    ['<C-Space>'] = cmp.mapping.complete {},
-    ['<CR>'] = cmp.mapping.confirm {
-      behavior = cmp.ConfirmBehavior.Replace,
-      select = true,
-    },
-    ['<Tab>'] = cmp.mapping(function(fallback)
-      if cmp.visible() then
-        cmp.select_next_item()
-      elseif luasnip.expand_or_locally_jumpable() then
-        luasnip.expand_or_jump()
-      else
-        fallback()
-      end
-    end, { 'i', 's' }),
-    ['<S-Tab>'] = cmp.mapping(function(fallback)
-      if cmp.visible() then
-        cmp.select_prev_item()
-      elseif luasnip.locally_jumpable(-1) then
-        luasnip.jump(-1)
-      else
-        fallback()
-      end
-    end, { 'i', 's' }),
-  },
-  sources = {
-    { name = 'nvim_lsp' },
-    { name = 'luasnip' },
-    { name = 'path' },
-  },
-}
+-- local luasnip = require 'luasnip'
+-- require('luasnip.loaders.from_vscode').lazy_load()
+-- luasnip.config.setup {}
+--
+-- cmp.setup {
+--   snippet = {
+--     expand = function(args)
+--       luasnip.lsp_expand(args.body)
+--     end,
+--   },
+--   completion = {
+--     completeopt = 'menu,menuone,noinsert',
+--   },
+--   mapping = cmp.mapping.preset.insert {
+--     ['<C-n>'] = cmp.mapping.select_next_item(),
+--     ['<C-p>'] = cmp.mapping.select_prev_item(),
+--     ['<C-b>'] = cmp.mapping.scroll_docs(-4),
+--     ['<C-f>'] = cmp.mapping.scroll_docs(4),
+--     ['<C-Space>'] = cmp.mapping.complete {},
+--     ['<CR>'] = cmp.mapping.confirm {
+--       behavior = cmp.ConfirmBehavior.Replace,
+--       select = true,
+--     },
+--     ['<Tab>'] = cmp.mapping(function(fallback)
+--       if cmp.visible() then
+--         cmp.select_next_item()
+--       elseif luasnip.expand_or_locally_jumpable() then
+--         luasnip.expand_or_jump()
+--       else
+--         fallback()
+--       end
+--     end, { 'i', 's' }),
+--     ['<S-Tab>'] = cmp.mapping(function(fallback)
+--       if cmp.visible() then
+--         cmp.select_prev_item()
+--       elseif luasnip.locally_jumpable(-1) then
+--         luasnip.jump(-1)
+--       else
+--         fallback()
+--       end
+--     end, { 'i', 's' }),
+--   },
+--   sources = {
+--     { name = 'nvim_lsp' },
+--     { name = 'luasnip' },
+--     { name = 'path' },
+--   },
+-- }
 
 vim.api.nvim_create_autocmd("BufWritePre", {
   pattern = "*",
