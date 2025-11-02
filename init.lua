@@ -38,6 +38,12 @@ require('lazy').setup({
     },
   },
   {
+      "supermaven-inc/supermaven-nvim",
+      config = function()
+        require("supermaven-nvim").setup({})
+      end,
+ },
+  {
     -- Autocompletion
     'hrsh7th/nvim-cmp',
     dependencies = {
@@ -393,7 +399,7 @@ require('lazy').setup({
   },
   --only turn on when also having plugin in webbrowser
   --https://chromewebstore.google.com/detail/firenvim/egpjdkipkomnmjhjmdamaniclmdlobbo
-  { 'glacambre/firenvim', build = ":call firenvim#install(0)" },
+  -- { 'glacambre/firenvim', build = ":call firenvim#install(0)" },
   {
     "leath-dub/snipe.nvim",
     keys = {
